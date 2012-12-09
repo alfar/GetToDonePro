@@ -3,7 +3,7 @@ package dk.gettodone.pro;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class GetToDoneProActivity extends Activity {
+public class GetToDoneProCollectActivity extends Activity {
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
