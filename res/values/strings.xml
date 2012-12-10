@@ -5,4 +5,5 @@
     <string name="app_name">GetToDonePro</string>
 	<string name="text_collect_hint">Put stuff here</string>
 	<string name="collect">Collect</string>
+	<string name="menu_do">Do</string>
 </resources>
