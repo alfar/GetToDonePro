@@ -9,10 +9,13 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 
-public class TasksDataSource {
+public class TasksDataSource implements ITasksDataSource {
 	private SQLiteDatabase database;
 	private TasksOpenHelper dbhelper;
 	private String[] allColumns = { TasksOpenHelper.COLUMN_ID, TasksOpenHelper.COLUMN_TASKS_TITLE };
+	
+	private ArrayList<TaskChangedListener> createdListeners = new ArrayList<TaskChangedListener>();
+	private ArrayList<TaskChangedListener> deletedListeners = new ArrayList<TaskChangedListener>();
 	
 	public TasksDataSource(Context context) {
 		dbhelper = new TasksOpenHelper(context);		
@@ -34,6 +37,7 @@ public class TasksDataSource {
 	    cursor.moveToFirst();
 	    Task newTask = cursorToTask(cursor);
 	    cursor.close();
+	    raiseOnTaskChanged(createdListeners, newTask);
 	    return newTask;
 	}
 	
@@ -57,6 +61,7 @@ public class TasksDataSource {
 	public void deleteTask(Task task) {
 	    long id = task.getId();
 	    database.delete(TasksOpenHelper.TABLE_TASKS, TasksOpenHelper.COLUMN_ID + " = " + id, null);
+	    raiseOnTaskChanged(deletedListeners, task);
 	}
 	
 	private Task cursorToTask(Cursor cursor) {
@@ -64,5 +69,27 @@ public class TasksDataSource {
 		task.setId(cursor.getLong(0));
 		task.setTitle(cursor.getString(1));
 		return task;
-	}	
+	}
+
+	public void pause() {
+		this.close();
+	}
+
+	public void resume() {
+		this.open();		
+	}
+	
+	public void setOnTaskCreatedListener(TaskChangedListener listener) {
+		createdListeners.add(listener);
+	}
+
+	public void setOnTaskDeletedListener(TaskChangedListener listener) {
+		deletedListeners.add(listener);
+	}
+
+	private void raiseOnTaskChanged(ArrayList<TaskChangedListener> listeners, Task task) {
+		for (TaskChangedListener listener : listeners) {
+			listener.onTaskChanged(task);
+		}
+	}
 }

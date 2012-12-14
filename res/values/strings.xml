@@ -6,4 +6,8 @@
 	<string name="text_collect_hint">Put stuff here</string>
 	<string name="collect">Collect</string>
 	<string name="menu_do">Do</string>
+	
+	<string name="process_whatis">What is&#8230;</string>	
+	<string name="process_trash">Trash</string>
+	<string name="process_context">Do ASAP</string>
 </resources>
