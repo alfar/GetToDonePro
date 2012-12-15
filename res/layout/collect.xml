@@ -4,17 +4,19 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal" >
 
-
-
     <EditText
         android:id="@+id/textCollect"
         android:layout_width="0dip"
         android:layout_height="wrap_content"
-        android:ems="10" android:inputType="textAutoCorrect" android:hint="@string/text_collect_hint" android:layout_weight="1" >
+        android:layout_weight="1"
+        android:ems="10"
+        android:hint="@string/text_collect_hint"
+        android:imeOptions="actionDone"
+        android:inputType="textAutoCorrect"
+        android:singleLine="true" >
 
         <requestFocus />
     </EditText>
-
 
     <Button
         android:id="@+id/buttonCollect"

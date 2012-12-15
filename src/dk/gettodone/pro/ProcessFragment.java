@@ -60,7 +60,9 @@ public class ProcessFragment extends Fragment {
 		btnContext.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				Toast.makeText(getActivity(), "Send to Context", 1000).show();
+				datasource.processTaskToContext(activeTask, 1);				
+				Toast.makeText(getActivity(), "Sent to Context", 1000).show();
+				showNextProcessableTask();
 			}
 		});
 
@@ -69,8 +71,8 @@ public class ProcessFragment extends Fragment {
 
 			public void onClick(View v) {
 				datasource.deleteTask(activeTask);
-				showNextProcessableTask();
 				Toast.makeText(getActivity(), "Trashed!", 1000).show();
+				showNextProcessableTask();
 			}
 		});
 

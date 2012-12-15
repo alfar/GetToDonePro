@@ -12,13 +12,16 @@ import android.database.sqlite.SQLiteDatabase;
 public class TasksDataSource implements ITasksDataSource {
 	private SQLiteDatabase database;
 	private TasksOpenHelper dbhelper;
-	private String[] allColumns = { TasksOpenHelper.COLUMN_ID, TasksOpenHelper.COLUMN_TASKS_TITLE };
+	private String[] allColumns = { TasksOpenHelper.COLUMN_ID,
+			TasksOpenHelper.COLUMN_TASKS_TITLE,
+			TasksOpenHelper.COLUMN_TASKS_CONTEXTID };
 
 	private ArrayList<TaskChangedListener> createdListeners = new ArrayList<TaskChangedListener>();
+	private ArrayList<TaskChangedListener> processedListeners = new ArrayList<TaskChangedListener>();
 	private ArrayList<TaskChangedListener> deletedListeners = new ArrayList<TaskChangedListener>();
 
 	public TasksDataSource(Context context) {
-		dbhelper = new TasksOpenHelper(context);		
+		dbhelper = new TasksOpenHelper(context);
 	}
 
 	public void open() throws SQLException {
@@ -32,8 +35,11 @@ public class TasksDataSource implements ITasksDataSource {
 	public Task createTask(String title) {
 		ContentValues values = new ContentValues();
 		values.put(TasksOpenHelper.COLUMN_TASKS_TITLE, title);
-		long insertId = database.insert(TasksOpenHelper.TABLE_TASKS, null, values);
-		Cursor cursor = database.query(TasksOpenHelper.TABLE_TASKS, allColumns, TasksOpenHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
+		long insertId = database.insert(TasksOpenHelper.TABLE_TASKS, null,
+				values);
+		Cursor cursor = database.query(TasksOpenHelper.TABLE_TASKS, allColumns,
+				TasksOpenHelper.COLUMN_ID + " = ?",
+				new String[] { Long.toString(insertId) }, null, null, null);
 		cursor.moveToFirst();
 		Task newTask = cursorToTask(cursor);
 		cursor.close();
@@ -44,8 +50,9 @@ public class TasksDataSource implements ITasksDataSource {
 	public List<Task> getAllTasks() {
 		List<Task> tasks = new ArrayList<Task>();
 
-		Cursor cursor = database.query(TasksOpenHelper.TABLE_TASKS,
-				allColumns, null, null, null, null, null);
+		Cursor cursor = database.query(TasksOpenHelper.TABLE_TASKS, allColumns,
+				TasksOpenHelper.COLUMN_TASKS_CONTEXTID + " IS NOT NULL", null,
+				null, null, null);
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
@@ -53,27 +60,39 @@ public class TasksDataSource implements ITasksDataSource {
 			tasks.add(task);
 			cursor.moveToNext();
 		}
-		// Make sure to close the cursor
 		cursor.close();
 		return tasks;
 	}
 
 	public Task getNextProcessableTask() {
-		Cursor cursor = database.query(TasksOpenHelper.TABLE_TASKS,
-				allColumns, null, null, null, null, TasksOpenHelper.COLUMN_ID + " desc", "1");
+		Cursor cursor = database.query(TasksOpenHelper.TABLE_TASKS, allColumns,
+				TasksOpenHelper.COLUMN_TASKS_CONTEXTID + " IS NULL", null,
+				null, null, TasksOpenHelper.COLUMN_ID + " asc", "1");
 
 		cursor.moveToFirst();
 		Task task = null;
 		if (!cursor.isAfterLast()) {
-			task= cursorToTask(cursor);
+			task = cursorToTask(cursor);
 		}
 		cursor.close();
 		return task;
 	}
 
+	public void processTaskToContext(Task task, long contextId) {
+		ContentValues values = new ContentValues();
+		values.put(TasksOpenHelper.COLUMN_TASKS_CONTEXTID, contextId);
+
+		long id = task.getId();
+		database.update(TasksOpenHelper.TABLE_TASKS, values,
+				TasksOpenHelper.COLUMN_ID + " = ?",
+				new String[] { Long.toString(id) });
+		raiseOnTaskChanged(processedListeners, task);
+	}
+
 	public void deleteTask(Task task) {
 		long id = task.getId();
-		database.delete(TasksOpenHelper.TABLE_TASKS, TasksOpenHelper.COLUMN_ID + " = " + id, null);
+		database.delete(TasksOpenHelper.TABLE_TASKS, TasksOpenHelper.COLUMN_ID
+				+ " = ?", new String[] { Long.toString(id) });
 		raiseOnTaskChanged(deletedListeners, task);
 	}
 
@@ -81,6 +100,9 @@ public class TasksDataSource implements ITasksDataSource {
 		Task task = new Task();
 		task.setId(cursor.getLong(0));
 		task.setTitle(cursor.getString(1));
+		if (!cursor.isNull(2)) {
+			task.setContextId(cursor.getLong(2));
+		}
 		return task;
 	}
 
@@ -89,18 +111,23 @@ public class TasksDataSource implements ITasksDataSource {
 	}
 
 	public void resume() {
-		this.open();		
+		this.open();
 	}
 
 	public void setOnTaskCreatedListener(TaskChangedListener listener) {
 		createdListeners.add(listener);
 	}
 
+	public void setOnTaskProcessedListener(TaskChangedListener listener) {
+		processedListeners.add(listener);
+	}
+
 	public void setOnTaskDeletedListener(TaskChangedListener listener) {
 		deletedListeners.add(listener);
 	}
 
-	private void raiseOnTaskChanged(ArrayList<TaskChangedListener> listeners, Task task) {
+	private void raiseOnTaskChanged(ArrayList<TaskChangedListener> listeners,
+			Task task) {
 		for (TaskChangedListener listener : listeners) {
 			listener.onTaskChanged(task);
 		}
