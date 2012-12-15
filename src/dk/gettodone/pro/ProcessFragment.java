@@ -26,7 +26,8 @@ public class ProcessFragment extends Fragment {
 		}
 	}
 
-	private ITasksDataSource datasource;	
+	private ITasksDataSource datasource;
+	private Task activeTask;
 
 	public ProcessFragment(ITasksDataSource ds) {
 		this.datasource = ds;
@@ -37,11 +38,11 @@ public class ProcessFragment extends Fragment {
 	}
 
 	private void showNextProcessableTask(View view) {
-		Task task = datasource.getNextProcessableTask();
+		activeTask = datasource.getNextProcessableTask();
 
-		if (task != null) { 
+		if (activeTask != null) { 
 			TextView tv = (TextView)view.findViewById(R.id.textViewTaskTitle);
-			tv.setText(datasource.getNextProcessableTask().getTitle());
+			tv.setText(activeTask.getTitle());
 		}
 		else
 		{
@@ -67,7 +68,9 @@ public class ProcessFragment extends Fragment {
 		btnTrash.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				Toast.makeText(getActivity(), "Throw away!", 1000).show();
+				datasource.deleteTask(activeTask);
+				showNextProcessableTask();
+				Toast.makeText(getActivity(), "Trashed!", 1000).show();
 			}
 		});
 
