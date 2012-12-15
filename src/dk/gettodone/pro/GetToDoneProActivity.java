@@ -19,10 +19,11 @@ public class GetToDoneProActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState); 
+		datasource = new TasksDataSource(this);
+		datasource.resume();
+
 		setContentView(R.layout.main);
 		
-		datasource = new TasksDataSource(this);
-
 		ActionBar bar = getActionBar();
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
