@@ -15,4 +15,6 @@
 	<string name="process_calendar">Calendar</string>
 	<string name="process_delegate">Delegate</string>
 	<string name="process_someday">Some day/Maybe</string>
+	
+	<string name="doing_done">Done</string>
 </resources>

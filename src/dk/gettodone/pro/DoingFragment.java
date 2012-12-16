@@ -9,16 +9,26 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 public class DoingFragment extends ListFragment {
 	private TasksDataSource datasource;
-	
+
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		// Inflate the layout for this fragment
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.doing, container, false);
 	}
+	
+	@Override
+	public void onListItemClick(ListView l, View v, int position, long id) {
+		Task task = (Task) l.getItemAtPosition(position);
+
+		datasource.deleteTask(task);
+	}	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +55,5 @@ public class DoingFragment extends ListFragment {
 		datasource.open();
 		super.onResume();
 	}
-	
-	
+
 }
