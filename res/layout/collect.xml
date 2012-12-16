@@ -18,10 +18,11 @@
         <requestFocus />
     </EditText>
 
-    <Button
+    <ImageButton
         android:id="@+id/buttonCollect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/collect" />
+        android:contentDescription="@string/collect"
+        android:src="@drawable/ic_collect" android:background="@null" />
 
 </LinearLayout>

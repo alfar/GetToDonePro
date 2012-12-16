@@ -10,4 +10,9 @@
 	<string name="process_whatis">What is&#8230;</string>	
 	<string name="process_trash">Trash</string>
 	<string name="process_context">Do ASAP</string>
+	<string name="process_project">Project</string>
+	<string name="process_do">Do it</string>
+	<string name="process_calendar">Calendar</string>
+	<string name="process_delegate">Delegate</string>
+	<string name="process_someday">Some day/Maybe</string>
 </resources>

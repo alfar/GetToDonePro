@@ -18,10 +18,11 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TableLayout
+        android:id="@+id/tableProcessOptions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:stretchColumns="0,1">
+        android:stretchColumns="0,1" >
 
         <TableRow
             android:id="@+id/tableRow1"
@@ -33,37 +34,75 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_horizontal"
-                android:layout_marginRight="4dip"
                 android:contentDescription="@string/process_trash"
-                android:src="@drawable/ic_launcher" />
+                android:src="@drawable/ic_trash" />
 
             <ImageButton
-                android:id="@+id/button_process_context"
+                android:id="@+id/button_process_someday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center|center_horizontal"
-                android:layout_marginLeft="4dip"
-                android:contentDescription="@string/process_context"
-                android:src="@drawable/ic_launcher" />
-
+                android:contentDescription="@string/process_someday"
+                android:src="@drawable/ic_someday" />
         </TableRow>
 
         <TableRow
             android:id="@+id/tableRow2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
+
+            <ImageButton
+                android:id="@+id/button_process_project"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:contentDescription="@string/process_project"
+                android:src="@drawable/ic_project" />
+
+            <ImageButton
+                android:id="@+id/button_process_do"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:contentDescription="@string/process_do"
+                android:src="@drawable/ic_done" />
         </TableRow>
 
         <TableRow
             android:id="@+id/tableRow3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
+
+            <ImageButton
+                android:id="@+id/button_process_delegate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:contentDescription="@string/process_delegate"
+                android:src="@drawable/ic_delegate" />
+            <ImageButton
+                android:id="@+id/button_process_calendar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_gravity="center|center_horizontal"
+                android:contentDescription="@string/process_calendar"
+                android:src="@drawable/ic_calendar" />
         </TableRow>
 
         <TableRow
             android:id="@+id/tableRow4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" >
+
+            <ImageButton
+                android:id="@+id/button_process_context"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|center_horizontal"
+                android:layout_span="2"
+                android:contentDescription="@string/process_context"
+                android:src="@drawable/ic_context" />
         </TableRow>
     </TableLayout>
 

@@ -13,11 +13,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
@@ -35,7 +34,8 @@ public class GetToDoneProActivity extends Activity {
 		ActionBar bar = getActionBar();
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-		Fragment processFragment = new ProcessFragment(datasource);
+		ProcessFragment processFragment = new ProcessFragment();
+		processFragment.setDataSource((ITasksDataSource)datasource);
 		Fragment doingFragment = new DoingFragment();
 
 		ActionBar.Tab collectTab = bar.newTab();
@@ -55,7 +55,7 @@ public class GetToDoneProActivity extends Activity {
 		inflater.inflate(R.menu.main_activity, menu);
 
 		View collectView = menu.findItem(R.id.item_collect).getActionView();
-		Button buttonCollect = (Button) collectView
+		ImageButton buttonCollect = (ImageButton) collectView
 				.findViewById(R.id.buttonCollect);
 
 		EditText textCollect = (EditText) collectView
