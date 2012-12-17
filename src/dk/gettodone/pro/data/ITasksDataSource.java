@@ -1,5 +1,7 @@
 package dk.gettodone.pro.data;
 
+import java.util.List;
+
 public interface ITasksDataSource {
 	void pause();
 
@@ -8,8 +10,12 @@ public interface ITasksDataSource {
 	Task createTask(String title);
 
 	Task getNextProcessableTask();
+	
+	List<Task> getContextTasks();
 
 	void processTaskToContext(Task task, long contextId);
+	
+	void finishTask(Task task);
 
 	void deleteTask(Task task);
 
@@ -18,4 +24,6 @@ public interface ITasksDataSource {
 	void setOnTaskProcessedListener(TaskChangedListener listener);
 
 	void setOnTaskDeletedListener(TaskChangedListener listener);
+
+	void setOnTaskFinishedListener(TaskChangedListener listener);
 }

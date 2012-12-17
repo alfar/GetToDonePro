@@ -4,7 +4,6 @@ import dk.gettodone.pro.data.ITasksDataSource;
 import dk.gettodone.pro.data.TasksDataSource;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -35,8 +34,8 @@ public class GetToDoneProActivity extends Activity {
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		ProcessFragment processFragment = new ProcessFragment();
-		processFragment.setDataSource((ITasksDataSource)datasource);
-		Fragment doingFragment = new DoingFragment();
+		processFragment.setDataSource(datasource);
+		DoingFragment doingFragment = new DoingFragment(datasource);
 
 		ActionBar.Tab collectTab = bar.newTab();
 		collectTab.setText("Process");

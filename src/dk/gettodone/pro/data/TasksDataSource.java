@@ -19,6 +19,7 @@ public class TasksDataSource implements ITasksDataSource {
 	private ArrayList<TaskChangedListener> createdListeners = new ArrayList<TaskChangedListener>();
 	private ArrayList<TaskChangedListener> processedListeners = new ArrayList<TaskChangedListener>();
 	private ArrayList<TaskChangedListener> deletedListeners = new ArrayList<TaskChangedListener>();
+	private ArrayList<TaskChangedListener> finishedListeners = new ArrayList<TaskChangedListener>();
 
 	public TasksDataSource(Context context) {
 		dbhelper = new TasksOpenHelper(context);
@@ -47,11 +48,12 @@ public class TasksDataSource implements ITasksDataSource {
 		return newTask;
 	}
 
-	public List<Task> getAllTasks() {
+	public List<Task> getContextTasks() {
 		List<Task> tasks = new ArrayList<Task>();
 
 		Cursor cursor = database.query(TasksOpenHelper.TABLE_TASKS, allColumns,
-				TasksOpenHelper.COLUMN_TASKS_CONTEXTID + " IS NOT NULL", null,
+				TasksOpenHelper.COLUMN_TASKS_CONTEXTID + " IS NOT NULL AND " + 
+				TasksOpenHelper.COLUMN_TASKS_FINISHED + " IS NULL", null,
 				null, null, null);
 
 		cursor.moveToFirst();
@@ -66,7 +68,8 @@ public class TasksDataSource implements ITasksDataSource {
 
 	public Task getNextProcessableTask() {
 		Cursor cursor = database.query(TasksOpenHelper.TABLE_TASKS, allColumns,
-				TasksOpenHelper.COLUMN_TASKS_CONTEXTID + " IS NULL", null,
+				TasksOpenHelper.COLUMN_TASKS_CONTEXTID + " IS NULL AND " + 
+				TasksOpenHelper.COLUMN_TASKS_FINISHED + " IS NULL", null,
 				null, null, TasksOpenHelper.COLUMN_ID + " asc", "1");
 
 		cursor.moveToFirst();
@@ -126,10 +129,25 @@ public class TasksDataSource implements ITasksDataSource {
 		deletedListeners.add(listener);
 	}
 
+	public void setOnTaskFinishedListener(TaskChangedListener listener) {
+		finishedListeners.add(listener);
+	}
+
 	private void raiseOnTaskChanged(ArrayList<TaskChangedListener> listeners,
 			Task task) {
 		for (TaskChangedListener listener : listeners) {
 			listener.onTaskChanged(task);
 		}
+	}
+
+	public void finishTask(Task task) {
+		ContentValues values = new ContentValues();
+		values.put(TasksOpenHelper.COLUMN_TASKS_FINISHED, System.currentTimeMillis() / 1000); 
+
+		long id = task.getId();
+		database.update(TasksOpenHelper.TABLE_TASKS, values,
+				TasksOpenHelper.COLUMN_ID + " = ?",
+				new String[] { Long.toString(id) });
+		raiseOnTaskChanged(finishedListeners, task);		
 	}
 }

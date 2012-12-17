@@ -5,22 +5,27 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class TasksOpenHelper extends SQLiteOpenHelper {
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	private static final String DATABASE_NAME = "gettodone.db";
 	public static final String TABLE_TASKS = "Tasks";
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_TASKS_TITLE = "title";
 	public static final String COLUMN_TASKS_CONTEXTID = "contextId";
+	public static final String COLUMN_TASKS_FINISHED = "finished";
 	public static final String TABLE_CONTEXTS = "Contexts";
 	public static final String COLUMN_CONTEXTS_NAME = "name";
 
 	private static final String TASKS_TABLE_CREATE = "create table " + TABLE_TASKS + " (" +
 			COLUMN_ID + " integer primary key autoincrement, " +
 			COLUMN_TASKS_TITLE + " text not null, " +
-			COLUMN_TASKS_CONTEXTID + " integer null)";
+			COLUMN_TASKS_CONTEXTID + " integer null, " + 
+			COLUMN_TASKS_FINISHED + " datetime null)";
 
 	private static final String TASKS_TABLE_ADDCONTEXTS = "alter table " + TABLE_TASKS + " add column " +
 			COLUMN_TASKS_CONTEXTID + " integer null";
+
+	private static final String TASKS_TABLE_ADDFINISHED = "alter table " + TABLE_TASKS + " add column " +
+			COLUMN_TASKS_FINISHED + " datetime null";
 
 	private static final String CONTEXTS_TABLE_CREATE = "create table " + TABLE_CONTEXTS + " (" +
 			COLUMN_ID + " integer primary key autoincrement, " +
@@ -41,6 +46,9 @@ public class TasksOpenHelper extends SQLiteOpenHelper {
 		if (oldVersion == 1) {
 			db.execSQL(TASKS_TABLE_ADDCONTEXTS);
 			db.execSQL(CONTEXTS_TABLE_CREATE);			
+		}
+		if (oldVersion < 3) {
+			db.execSQL(TASKS_TABLE_ADDFINISHED);
 		}
 	}
 
