@@ -35,7 +35,7 @@ public class GetToDoneProActivity extends Activity {
 
 		ProcessFragment processFragment = new ProcessFragment();
 		processFragment.setDataSource(datasource);
-		DoingFragment doingFragment = new DoingFragment(datasource);
+		DoingFragment doingFragment = new DoingFragment();
 
 		ActionBar.Tab collectTab = bar.newTab();
 		collectTab.setText("Process");

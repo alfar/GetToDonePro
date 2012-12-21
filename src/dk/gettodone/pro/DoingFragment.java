@@ -1,68 +1,75 @@
 package dk.gettodone.pro;
 
-import java.util.List;
-
-import dk.gettodone.pro.data.ITasksDataSource;
-import dk.gettodone.pro.data.Task;
-import dk.gettodone.pro.data.TaskChangedListener;
+import dk.gettodone.pro.data.GetToDoneProContentProvider;
+import dk.gettodone.pro.data.TasksOpenHelper;
 import android.app.ListFragment;
+import android.app.LoaderManager.LoaderCallbacks;
+import android.content.ContentValues;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CursorAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
-public class DoingFragment extends ListFragment {
-	private final class TaskFinishedListener implements TaskChangedListener {
-		private DoingFragment owner;
-
-		public TaskFinishedListener(DoingFragment owner) {
-			this.owner = owner;
-		}
-
-		public void onTaskChanged(Task task) {
-			owner.refreshListView();
-		}
-	}
-	
-	private ITasksDataSource datasource;
-	public DoingFragment(ITasksDataSource datasource) {
-		this.datasource = datasource;
-		datasource.setOnTaskFinishedListener(new TaskFinishedListener(this));
-	}
+public class DoingFragment extends ListFragment implements
+		LoaderCallbacks<Cursor> {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		return inflater.inflate(R.layout.doing, container, false);
 	}
-	
+
 	public void refreshListView() {
 		ListAdapter adapter = this.getListAdapter();
-		if (adapter instanceof ArrayAdapter<?>)
-		{
-			ArrayAdapter<?> list = (ArrayAdapter<?>)adapter;
+		if (adapter instanceof ArrayAdapter<?>) {
+			ArrayAdapter<?> list = (ArrayAdapter<?>) adapter;
 			list.notifyDataSetChanged();
 		}
 	}
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		Task task = (Task) l.getItemAtPosition(position);
+		ContentValues mUpdateValues = new ContentValues();
+		int mRowsUpdated = 0;
 
-		datasource.finishTask(task);
-	}	
+		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_FINISHED,
+				System.currentTimeMillis() / 1000);
+
+		mRowsUpdated = getActivity().getContentResolver().update(
+				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
+						+ Long.toString(id)), mUpdateValues, null, null);
+
+		if (mRowsUpdated > 0) {
+			Toast.makeText(getActivity(), "Done!", 1000).show();
+		}
+	}
+
+	private static final int TASK_LIST_LOADER = 0x01;
+	private SimpleCursorAdapter adapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		List<Task> tasks = datasource.getContextTasks();
+		String[] uiBindFrom = { TasksOpenHelper.COLUMN_TASKS_TITLE,
+				TasksOpenHelper.COLUMN_CONTEXTS_NAME };
+		int[] uiBindTo = { R.id.doing_item_title, R.id.doing_item_context };
 
-		ArrayAdapter<Task> adapter = new ArrayAdapter<Task>(getActivity(),
-				android.R.layout.simple_list_item_1, tasks);
+		getLoaderManager().initLoader(TASK_LIST_LOADER, null, this);
+		adapter = new SimpleCursorAdapter(
+				getActivity().getApplicationContext(), R.layout.doing_item,
+				null, uiBindFrom, uiBindTo,
+				CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 		setListAdapter(adapter);
 	}
 
@@ -76,4 +83,23 @@ public class DoingFragment extends ListFragment {
 		super.onResume();
 	}
 
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		String[] projection = {
+				TasksOpenHelper.TABLE_TASKS + "." + TasksOpenHelper.COLUMN_ID,
+				TasksOpenHelper.COLUMN_TASKS_TITLE,
+				TasksOpenHelper.COLUMN_CONTEXTS_NAME };
+
+		CursorLoader cursorLoader = new CursorLoader(getActivity(),
+				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI,
+						"/context"), projection, null, null, null);
+		return cursorLoader;
+	}
+
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		adapter.swapCursor(cursor);
+	}
+
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		adapter.swapCursor(null);
+	}
 }
