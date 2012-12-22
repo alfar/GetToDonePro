@@ -1,5 +1,6 @@
 package dk.gettodone.pro;
 
+import dk.gettodone.pro.data.ContentHelper;
 import dk.gettodone.pro.data.ITasksDataSource;
 import dk.gettodone.pro.data.TasksDataSource;
 import android.app.ActionBar;
@@ -34,7 +35,6 @@ public class GetToDoneProActivity extends Activity {
 		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
 		ProcessFragment processFragment = new ProcessFragment();
-		processFragment.setDataSource(datasource);
 		DoingFragment doingFragment = new DoingFragment();
 
 		ActionBar.Tab collectTab = bar.newTab();
@@ -54,10 +54,10 @@ public class GetToDoneProActivity extends Activity {
 		inflater.inflate(R.menu.main_activity, menu);
 
 		View collectView = menu.findItem(R.id.item_collect).getActionView();
-		ImageButton buttonCollect = (ImageButton) collectView
+		final ImageButton buttonCollect = (ImageButton) collectView
 				.findViewById(R.id.buttonCollect);
 
-		EditText textCollect = (EditText) collectView
+		final EditText textCollect = (EditText) collectView
 				.findViewById(R.id.textCollect);
 
 		textCollect.setOnEditorActionListener(new OnEditorActionListener() {
@@ -65,14 +65,18 @@ public class GetToDoneProActivity extends Activity {
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-					return ((View) v.getParent()).findViewById(
-							R.id.buttonCollect).performClick();
+					return buttonCollect.performClick();
 				}
 				return false;
 			}
 		});
 
-		buttonCollect.setOnClickListener(new CollectClickListener(datasource));
+		buttonCollect.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				ContentHelper.createTask(getContentResolver(), textCollect.getText().toString());
+				textCollect.setText("");
+			}			
+		});
 		return true;
 	}
 
@@ -97,22 +101,5 @@ public class GetToDoneProActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		datasource.resume();
-	}
-
-	private class CollectClickListener implements OnClickListener {
-		private ITasksDataSource datasource;
-
-		public CollectClickListener(ITasksDataSource datasource) {
-			super();
-			this.datasource = datasource;
-		}
-
-		public void onClick(View v) {
-			View collectView = (View) v.getParent();
-			EditText textCollect = (EditText) collectView
-					.findViewById(R.id.textCollect);
-			datasource.createTask(textCollect.getText().toString());
-			textCollect.setText("");
-		}
 	}
 }

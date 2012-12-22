@@ -1,19 +1,17 @@
 package dk.gettodone.pro;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import dk.gettodone.pro.data.ContentHelper;
-import dk.gettodone.pro.data.ITasksDataSource;
-import dk.gettodone.pro.data.TasksOpenHelper;
+import dk.gettodone.pro.data.Context;
 import dk.gettodone.pro.data.GetToDoneProContentProvider;
 import dk.gettodone.pro.data.Task;
-import dk.gettodone.pro.data.TaskChangedListener;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.database.Cursor;
+import android.database.ContentObserver;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,35 +23,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ProcessFragment extends Fragment {
-	private final class TaskCreatedListener implements TaskChangedListener {
-		private ProcessFragment owner;
-
-		public TaskCreatedListener(ProcessFragment owner) {
-			this.owner = owner;
-		}
-
-		public void onTaskChanged(Task task) {
-			owner.showNextProcessableTask();
-		}
-	}
-
-	private ITasksDataSource datasource;
 	private Task activeTask;
-
-	public void setDataSource(ITasksDataSource ds) {
-		this.datasource = ds;
-		this.datasource.setOnTaskCreatedListener(new TaskCreatedListener(this));
-		showNextProcessableTask();
-	}
 
 	private void showNextProcessableTask() {
 		showNextProcessableTask(getView());
 	}
 
 	private void showNextProcessableTask(View view) {
-		if (datasource != null && view != null) {
-
-			activeTask = datasource.getNextProcessableTask();
+		if (view != null) {
+			activeTask = ContentHelper.getNextProcessableTask(getActivity()
+					.getContentResolver());
 
 			TextView tv = (TextView) view.findViewById(R.id.textViewTaskTitle);
 			TableLayout tableProcessOptions = (TableLayout) view
@@ -79,64 +58,73 @@ public class ProcessFragment extends Fragment {
 		btnContext.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				Cursor contexts = getActivity().getContentResolver().query(
-						GetToDoneProContentProvider.CONTEXTS_URI,
-						new String[] { TasksOpenHelper.COLUMN_ID,
-								TasksOpenHelper.COLUMN_CONTEXTS_NAME }, null,
-						null, TasksOpenHelper.COLUMN_CONTEXTS_NAME);
+				final List<Context> contexts = ContentHelper
+						.getContexts(getActivity().getContentResolver());
+				contexts.add(new Context(-1, getResources().getString(
+						R.string.add_context)));
 
-				ArrayList<String> contextList = new ArrayList<String>();
-				final ArrayList<Integer> contextIds = new ArrayList<Integer>();
+				CharSequence[] contextItems = new CharSequence[contexts.size() - 1];
 
-				contexts.moveToFirst();
-				while (!contexts.isAfterLast()) {
-					contextIds.add(contexts.getInt(0));
-					contextList.add(contexts.getString(1));
-					contexts.moveToNext();
+				for (int i = 0; i < contexts.size() - 1; i++) {
+					contextItems[i] = contexts.get(i).toString();
 				}
-
-				contextList.add(getResources().getString(R.string.add_context));
-
-				final CharSequence[] items = new CharSequence[contextList
-						.size()];
-				contextList.toArray(items);
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						getActivity());
 				builder.setTitle("Pick a context");
-				builder.setItems(items, new AlertDialog.OnClickListener() {
+				builder.setItems(contextItems,
+						new AlertDialog.OnClickListener() {
 
-					public void onClick(DialogInterface dlg, int which) {
-						if (which == contextIds.size()) {
-							AlertDialog.Builder newContext = new AlertDialog.Builder(getActivity());
-							newContext.setTitle("Create a new context");
-							final EditText input = new EditText(getActivity());
-							newContext.setView(input);
-							newContext.setPositiveButton("Create", new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int which) {
-										ContentHelper.processTaskToNewContext(getActivity().getContentResolver(), activeTask.getId(), input.getText().toString());
-									
-										Toast.makeText(getActivity(), "Sent to context",
-												1000).show();
-										showNextProcessableTask();
-								}});
-							newContext.setNegativeButton("Cancel", null);
-							newContext.show();
-						} else {
-							int id = contextIds.get(which);
+							public void onClick(DialogInterface dlg, int which) {
+								Context chosenContext = contexts.get(which);
+								if (chosenContext.getId() == -1) {
+									AlertDialog.Builder newContext = new AlertDialog.Builder(
+											getActivity());
+									newContext.setTitle("Create a new context");
+									final EditText input = new EditText(
+											getActivity());
+									newContext.setView(input);
+									newContext
+											.setPositiveButton(
+													"Create",
+													new DialogInterface.OnClickListener() {
+														public void onClick(
+																DialogInterface dialog,
+																int which) {
+															ContentHelper
+																	.processTaskToNewContext(
+																			getActivity()
+																					.getContentResolver(),
+																			activeTask
+																					.getId(),
+																			input.getText()
+																					.toString());
 
-							ContentHelper.processTaskToContext(getActivity()
-									.getContentResolver(), activeTask.getId(),
-									id);
+															Toast.makeText(
+																	getActivity(),
+																	"Sent to context",
+																	1000)
+																	.show();
+															showNextProcessableTask();
+														}
+													});
+									newContext
+											.setNegativeButton("Cancel", null);
+									newContext.show();
+								} else {
+									long id = chosenContext.getId();
 
-							Toast.makeText(getActivity(), "Sent to Context",
-									1000).show();
-							showNextProcessableTask();
-						}
-					}
+									ContentHelper.processTaskToContext(
+											getActivity().getContentResolver(),
+											activeTask.getId(), id);
 
-				}).show();
+									Toast.makeText(getActivity(),
+											"Sent to Context", 1000).show();
+									showNextProcessableTask();
+								}
+							}
+
+						}).show();
 			}
 		});
 
@@ -145,15 +133,41 @@ public class ProcessFragment extends Fragment {
 
 		btnProject.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				ContentValues values = new ContentValues();
-				values.put(TasksOpenHelper.COLUMN_CONTEXTS_NAME, "Home");
-				getActivity().getContentResolver().insert(
-						GetToDoneProContentProvider.CONTEXTS_URI, values);
+				AlertDialog.Builder newContext = new AlertDialog.Builder(
+						getActivity());
+				newContext.setTitle("What's the next action?");
+				final EditText input = new EditText(getActivity());
+				input.setText(activeTask.getTitle());
+				newContext.setView(input);
+				newContext.setPositiveButton("Create",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								ContentHelper.processTaskToProject(
+										getActivity().getContentResolver(),
+										activeTask.getId(), input.getText()
+												.toString());
 
-				values = new ContentValues();
-				values.put(TasksOpenHelper.COLUMN_CONTEXTS_NAME, "Work");
-				getActivity().getContentResolver().insert(
-						GetToDoneProContentProvider.CONTEXTS_URI, values);
+								Toast.makeText(getActivity(),
+										"Project created", 1000).show();
+								showNextProcessableTask();
+							}
+						});
+				newContext.setNegativeButton("Cancel", null);
+				newContext.show();
+			}
+		});
+
+		ImageButton btnSomeday = (ImageButton) result
+				.findViewById(R.id.button_process_someday);
+
+		btnSomeday.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				ContentHelper.processTaskToSomeday(getActivity()
+						.getContentResolver(), activeTask.getId());
+
+				Toast.makeText(getActivity(), "Some day...", 1000).show();
+				showNextProcessableTask();
 			}
 		});
 
@@ -162,7 +176,8 @@ public class ProcessFragment extends Fragment {
 		btnTrash.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				datasource.deleteTask(activeTask);
+				ContentHelper.deleteTask(getActivity().getContentResolver(),
+						activeTask.getId());
 				Toast.makeText(getActivity(), "Trashed!", 1000).show();
 				showNextProcessableTask();
 			}
@@ -172,18 +187,42 @@ public class ProcessFragment extends Fragment {
 		return result;
 	}
 
+	TaskContentObserver tasksWatcher;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		tasksWatcher = new TaskContentObserver(new Handler());
+		getActivity().getContentResolver().registerContentObserver(
+				GetToDoneProContentProvider.TASKS_URI, false, tasksWatcher);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
+		getActivity().getContentResolver().unregisterContentObserver(
+				tasksWatcher);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		getActivity().getContentResolver().registerContentObserver(
+				GetToDoneProContentProvider.TASKS_URI, false, tasksWatcher);
+	}
+
+	public class TaskContentObserver extends ContentObserver {
+
+		public TaskContentObserver(Handler handler) {
+			super(handler);
+
+		}
+
+		@Override
+		public void onChange(boolean selfChange) {
+			super.onChange(selfChange);
+			showNextProcessableTask();
+		}
 	}
 }

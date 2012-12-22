@@ -1,5 +1,7 @@
 package dk.gettodone.pro.data;
 
+import android.database.Cursor;
+
 public class Task {
 	private long id;
 	private String title;
@@ -17,5 +19,15 @@ public class Task {
 	@Override
 	public String toString() {
 		return title;
+	}
+	
+	public static Task fromCursor(Cursor cursor) {
+		Task task = new Task();
+		task.setId(cursor.getLong(0));
+		task.setTitle(cursor.getString(1));
+		if (!cursor.isNull(2)) {
+			task.setContextId(cursor.getLong(2));
+		}
+		return task;	
 	}
 }
