@@ -35,6 +35,8 @@ public final class R {
         public static final int fragment_container=0x7f060004;
         public static final int item_collect=0x7f060014;
         public static final int item_do=0x7f060013;
+        public static final int item_projects=0x7f060015;
+        public static final int item_someday=0x7f060016;
         public static final int tableProcessOptions=0x7f060007;
         public static final int tableRow1=0x7f060008;
         public static final int tableRow2=0x7f06000b;
@@ -61,6 +63,8 @@ public final class R {
         public static final int collect=0x7f040003;
         public static final int doing_done=0x7f04000e;
         public static final int hello=0x7f040000;
+        public static final int item_projects=0x7f04000f;
+        public static final int item_someday=0x7f040010;
         public static final int menu_do=0x7f040004;
         public static final int process_calendar=0x7f04000b;
         public static final int process_context=0x7f040007;

@@ -158,6 +158,36 @@ public class ProcessFragment extends Fragment {
 			}
 		});
 
+		ImageButton btnDoNow = (ImageButton) result
+				.findViewById(R.id.button_process_do);
+
+		btnDoNow.setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				AlertDialog.Builder newContext = new AlertDialog.Builder(
+						getActivity());
+				newContext.setTitle("What's the next action?");
+				final EditText input = new EditText(getActivity());
+				input.setText(activeTask.getTitle());
+				newContext.setView(input);
+				newContext.setPositiveButton("Create",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								ContentHelper.processTaskToDone(
+										getActivity().getContentResolver(),
+										activeTask.getId(), input.getText()
+												.toString());
+
+								Toast.makeText(getActivity(),
+										"Done", 1000).show();
+								showNextProcessableTask();
+							}
+						});
+				newContext.setNegativeButton("Cancel", null);
+				newContext.show();
+			}
+		});
+
 		ImageButton btnSomeday = (ImageButton) result
 				.findViewById(R.id.button_process_someday);
 

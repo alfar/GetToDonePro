@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item android:id="@+id/item_collect" android:showAsAction="ifRoom" android:title="Collect" android:actionLayout="@layout/collect"></item>
+    <item android:id="@+id/item_projects" android:title="@string/item_projects"></item>
+    <item android:id="@+id/item_someday" android:title="@string/item_someday"></item>
     
-
 </menu>

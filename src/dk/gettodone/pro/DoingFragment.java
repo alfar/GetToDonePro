@@ -1,10 +1,10 @@
 package dk.gettodone.pro;
 
+import dk.gettodone.pro.data.ContentHelper;
 import dk.gettodone.pro.data.GetToDoneProContentProvider;
 import dk.gettodone.pro.data.TasksOpenHelper;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
@@ -39,19 +39,8 @@ public class DoingFragment extends ListFragment implements
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		ContentValues mUpdateValues = new ContentValues();
-		int mRowsUpdated = 0;
-
-		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_FINISHED,
-				System.currentTimeMillis() / 1000);
-
-		mRowsUpdated = getActivity().getContentResolver().update(
-				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
-						+ Long.toString(id)), mUpdateValues, null, null);
-
-		if (mRowsUpdated > 0) {
-			Toast.makeText(getActivity(), "Done!", 1000).show();
-		}
+		ContentHelper.finishTask(getActivity().getContentResolver(), id);
+		Toast.makeText(getActivity(), "Done!", 1000).show();
 	}
 
 	private static final int TASK_LIST_LOADER = 0x01;

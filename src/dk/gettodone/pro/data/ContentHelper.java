@@ -121,4 +121,23 @@ public class ContentHelper {
 				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
 						+ Long.toString(id)), mUpdateValues, null, null);
 	}
+
+	public static void processTaskToDone(ContentResolver contentResolver,
+			long id, String title) {
+		finishTask(contentResolver, id);
+		
+		createTask(contentResolver, title);
+	}
+
+	public static void finishTask(ContentResolver contentResolver,
+			long id) {
+		ContentValues mUpdateValues = new ContentValues();
+
+		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_FINISHED, System.currentTimeMillis() / 1000);
+
+		contentResolver.update(
+				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
+						+ Long.toString(id)), mUpdateValues, null, null);
+	}
+
 }

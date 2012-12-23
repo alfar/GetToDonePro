@@ -18,4 +18,7 @@
 	<string name="process_someday">Some day/Maybe</string>
 	
 	<string name="doing_done">Done</string>
+	
+	<string name="item_projects">Projects</string>
+	<string name="item_someday">Some day/Maybe</string>
 </resources>
