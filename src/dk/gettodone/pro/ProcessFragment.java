@@ -63,9 +63,9 @@ public class ProcessFragment extends Fragment {
 				contexts.add(new Context(-1, getResources().getString(
 						R.string.add_context)));
 
-				CharSequence[] contextItems = new CharSequence[contexts.size() - 1];
+				CharSequence[] contextItems = new CharSequence[contexts.size()];
 
-				for (int i = 0; i < contexts.size() - 1; i++) {
+				for (int i = 0; i < contexts.size(); i++) {
 					contextItems[i] = contexts.get(i).toString();
 				}
 
