@@ -2,6 +2,7 @@ package dk.gettodone.pro;
 
 import dk.gettodone.pro.data.ContentHelper;
 import dk.gettodone.pro.data.GetToDoneProContentProvider;
+import dk.gettodone.pro.data.Task;
 import dk.gettodone.pro.data.TasksOpenHelper;
 import android.app.ListFragment;
 import android.app.LoaderManager.LoaderCallbacks;
@@ -18,7 +19,6 @@ import android.widget.CursorAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 public class DoingFragment extends ListFragment implements
 		LoaderCallbacks<Cursor> {
@@ -39,8 +39,8 @@ public class DoingFragment extends ListFragment implements
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		ContentHelper.finishTask(getActivity().getContentResolver(), id);
-		Toast.makeText(getActivity(), "Done!", 1000).show();
+		Task task = ContentHelper.getTask(getActivity().getContentResolver(), id);
+		UIHelper.finishTask(getActivity(), task);
 	}
 
 	private static final int TASK_LIST_LOADER = 0x01;

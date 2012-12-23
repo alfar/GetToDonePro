@@ -14,7 +14,7 @@ public class ContentHelper {
 			TasksOpenHelper.TABLE_TASKS + "."
 					+ TasksOpenHelper.COLUMN_TASKS_TITLE,
 			TasksOpenHelper.TABLE_TASKS + "."
-					+ TasksOpenHelper.COLUMN_TASKS_CONTEXTID};
+					+ TasksOpenHelper.COLUMN_TASKS_CONTEXTID };
 
 	public static Task getNextProcessableTask(ContentResolver contentResolver) {
 		Cursor cursor = contentResolver.query(
@@ -125,19 +125,33 @@ public class ContentHelper {
 	public static void processTaskToDone(ContentResolver contentResolver,
 			long id, String title) {
 		finishTask(contentResolver, id);
-		
+
 		createTask(contentResolver, title);
 	}
 
-	public static void finishTask(ContentResolver contentResolver,
-			long id) {
+	public static void finishTask(ContentResolver contentResolver, long id) {
 		ContentValues mUpdateValues = new ContentValues();
 
-		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_FINISHED, System.currentTimeMillis() / 1000);
+		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_FINISHED,
+				System.currentTimeMillis() / 1000);
 
 		contentResolver.update(
 				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
 						+ Long.toString(id)), mUpdateValues, null, null);
 	}
 
+	public static Task getTask(ContentResolver contentResolver, long id) {
+		Cursor cursor = contentResolver.query(
+				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
+						+ Long.toString(id)), taskColumns, null, null,
+				TasksOpenHelper.COLUMN_TASKS_TITLE);
+
+		cursor.moveToFirst();
+		Task task = null;
+		if (!cursor.isAfterLast()) {
+			task = Task.fromCursor(cursor);
+		}
+		cursor.close();
+		return task;
+	}
 }

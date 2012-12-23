@@ -163,28 +163,7 @@ public class ProcessFragment extends Fragment {
 
 		btnDoNow.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				AlertDialog.Builder newContext = new AlertDialog.Builder(
-						getActivity());
-				newContext.setTitle("What's the next action?");
-				final EditText input = new EditText(getActivity());
-				input.setText(activeTask.getTitle());
-				newContext.setView(input);
-				newContext.setPositiveButton("Create",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int which) {
-								ContentHelper.processTaskToDone(
-										getActivity().getContentResolver(),
-										activeTask.getId(), input.getText()
-												.toString());
-
-								Toast.makeText(getActivity(),
-										"Done", 1000).show();
-								showNextProcessableTask();
-							}
-						});
-				newContext.setNegativeButton("Cancel", null);
-				newContext.show();
+				UIHelper.finishTask(getActivity(), activeTask);
 			}
 		});
 
@@ -241,6 +220,7 @@ public class ProcessFragment extends Fragment {
 		getActivity().getContentResolver().registerContentObserver(
 				GetToDoneProContentProvider.TASKS_URI, false, tasksWatcher);
 	}
+
 
 	public class TaskContentObserver extends ContentObserver {
 

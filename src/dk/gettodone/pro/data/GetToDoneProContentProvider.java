@@ -181,7 +181,8 @@ public class GetToDoneProContentProvider extends ContentProvider {
 			break;
 		case TASK_ID:
 			setupTasksQuery(queryBuilder);
-			queryBuilder.appendWhere(TasksOpenHelper.COLUMN_ID + "="
+			queryBuilder.appendWhere(TasksOpenHelper.TABLE_TASKS + "."
+					+ TasksOpenHelper.COLUMN_ID + "="
 					+ uri.getLastPathSegment());
 			break;
 		case CONTEXTS:
@@ -189,7 +190,8 @@ public class GetToDoneProContentProvider extends ContentProvider {
 			break;
 		case CONTEXT_ID:
 			setupContextsQuery(queryBuilder);
-			queryBuilder.appendWhere(TasksOpenHelper.COLUMN_ID + "="
+			queryBuilder.appendWhere(TasksOpenHelper.TABLE_CONTEXTS + "."
+					+ TasksOpenHelper.COLUMN_ID + "="
 					+ uri.getLastPathSegment());
 			break;
 		default:
