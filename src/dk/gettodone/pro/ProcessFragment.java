@@ -1,17 +1,22 @@
 package dk.gettodone.pro;
 
+import java.util.Calendar;
 import java.util.List;
 
 import dk.gettodone.pro.data.ContentHelper;
 import dk.gettodone.pro.data.Context;
 import dk.gettodone.pro.data.GetToDoneProContentProvider;
 import dk.gettodone.pro.data.Task;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -24,6 +29,8 @@ import android.widget.Toast;
 
 public class ProcessFragment extends Fragment {
 	private Task activeTask;
+	static final int PICK_CONTACT_REQUEST = 1; // The request code
+	static final int CREATE_CALENDAR_REQUEST = 2;
 
 	private void showNextProcessableTask() {
 		showNextProcessableTask(getView());
@@ -192,6 +199,40 @@ public class ProcessFragment extends Fragment {
 			}
 		});
 
+		ImageButton btnDelegate = (ImageButton) result
+				.findViewById(R.id.button_process_delegate);
+
+		btnDelegate.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				Intent pickContactIntent = new Intent(Intent.ACTION_PICK, Uri
+						.parse("content://contacts"));
+				pickContactIntent
+						.setType(ContactsContract.Contacts.CONTENT_TYPE);
+				startActivityForResult(pickContactIntent, PICK_CONTACT_REQUEST);
+			}
+		});
+
+		ImageButton btnCalendar = (ImageButton) result
+				.findViewById(R.id.button_process_calendar);
+
+		btnCalendar.setOnClickListener(new OnClickListener() {
+
+			public void onClick(View v) {
+				Calendar cal = Calendar.getInstance();
+				Intent intent = new Intent(Intent.ACTION_EDIT);
+				intent.setType("vnd.android.cursor.item/event");
+				intent.putExtra("beginTime", cal.getTimeInMillis());
+				intent.putExtra("endTime",
+						cal.getTimeInMillis() + 60 * 60 * 1000);
+				intent.putExtra("title", activeTask.getTitle());
+				startActivityForResult(intent, CREATE_CALENDAR_REQUEST);
+			}
+
+		}
+
+		);
+
 		showNextProcessableTask(result);
 		return result;
 	}
@@ -221,6 +262,32 @@ public class ProcessFragment extends Fragment {
 				GetToDoneProContentProvider.TASKS_URI, false, tasksWatcher);
 	}
 
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == PICK_CONTACT_REQUEST) {
+			if (resultCode == Activity.RESULT_OK) {
+				Uri contactUri = data.getData();
+
+				ContentHelper.processTaskToDelegate(getActivity()
+						.getContentResolver(), activeTask.getId(), 1,
+						contactUri.toString());
+
+				Toast.makeText(getActivity(), "Put in agenda", 1000).show();
+				showNextProcessableTask();
+			}
+		} else if (requestCode == CREATE_CALENDAR_REQUEST) {
+			if (resultCode == Activity.RESULT_OK) {
+				Uri calendarUri = data.getData();
+
+				ContentHelper.processTaskToDelegate(getActivity()
+						.getContentResolver(), activeTask.getId(), 2,
+						calendarUri.toString());
+
+				Toast.makeText(getActivity(), "Put in calendar", 1000).show();
+				showNextProcessableTask();
+			}			
+		}
+	}
 
 	public class TaskContentObserver extends ContentObserver {
 

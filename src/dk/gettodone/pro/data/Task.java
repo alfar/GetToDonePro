@@ -6,6 +6,8 @@ public class Task {
 	private long id;
 	private String title;
 	private long contextId = 0;
+	private long delegateType = 0;
+	private String delegateUrl;
 	
 	public long getId() { return id; }
 	public void setId(long value) { id = value; }
@@ -15,6 +17,12 @@ public class Task {
 	
 	public long getContextId() { return contextId; }
 	public void setContextId(long value) { contextId = value; }
+	
+	public long getDelegateType() { return delegateType; }
+	public void setDelegateType(long value) { delegateType = value; }
+	
+	public String getDelegateUrl() { return delegateUrl; }
+	public void setDelegateUrl(String delegateUrl) { this.delegateUrl = delegateUrl; }	
 	
 	@Override
 	public String toString() {
@@ -28,6 +36,15 @@ public class Task {
 		if (!cursor.isNull(2)) {
 			task.setContextId(cursor.getLong(2));
 		}
-		return task;	
+		
+		if (!cursor.isNull(3)) {
+			task.setDelegateType(cursor.getLong(3));
+		}
+		
+		if (!cursor.isNull(4)) {
+			task.setDelegateUrl(cursor.getString(4));
+		}
+		
+		return task;
 	}
 }

@@ -21,4 +21,7 @@
 	
 	<string name="item_projects">Projects</string>
 	<string name="item_someday">Some day/Maybe</string>
+	
+	<string name="activity_agenda">Agenda</string>
+	<string name="agenda_call">Call</string>
 </resources>

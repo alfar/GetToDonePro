@@ -14,7 +14,11 @@ public class ContentHelper {
 			TasksOpenHelper.TABLE_TASKS + "."
 					+ TasksOpenHelper.COLUMN_TASKS_TITLE,
 			TasksOpenHelper.TABLE_TASKS + "."
-					+ TasksOpenHelper.COLUMN_TASKS_CONTEXTID };
+					+ TasksOpenHelper.COLUMN_TASKS_CONTEXTID,
+			TasksOpenHelper.TABLE_TASKS + "."
+					+ TasksOpenHelper.COLUMN_TASKS_DELEGATETYPE,
+			TasksOpenHelper.TABLE_TASKS + "."
+					+ TasksOpenHelper.COLUMN_TASKS_DELEGATEURL };
 
 	public static Task getNextProcessableTask(ContentResolver contentResolver) {
 		Cursor cursor = contentResolver.query(
@@ -22,8 +26,10 @@ public class ContentHelper {
 				TasksOpenHelper.COLUMN_TASKS_CONTEXTID + " IS NULL AND "
 						+ TasksOpenHelper.COLUMN_TASKS_FINISHED
 						+ " IS NULL AND "
-						+ TasksOpenHelper.COLUMN_TASKS_ISPROJECT + " IS NULL",
-				null, TasksOpenHelper.COLUMN_TASKS_TITLE);
+						+ TasksOpenHelper.COLUMN_TASKS_ISPROJECT
+						+ " IS NULL AND "
+						+ TasksOpenHelper.COLUMN_TASKS_DELEGATETYPE
+						+ " IS NULL", null, TasksOpenHelper.COLUMN_TASKS_TITLE);
 
 		cursor.moveToFirst();
 		Task task = null;
@@ -153,5 +159,17 @@ public class ContentHelper {
 		}
 		cursor.close();
 		return task;
+	}
+
+	public static void processTaskToDelegate(ContentResolver contentResolver,
+			long id, int type, String uri) {
+		ContentValues mUpdateValues = new ContentValues();
+
+		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_DELEGATETYPE, type);
+		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_DELEGATEURL, uri);
+
+		contentResolver.update(
+				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
+						+ Long.toString(id)), mUpdateValues, null, null);
 	}
 }

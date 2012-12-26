@@ -1,8 +1,6 @@
 package dk.gettodone.pro;
 
 import dk.gettodone.pro.data.ContentHelper;
-import dk.gettodone.pro.data.ITasksDataSource;
-import dk.gettodone.pro.data.TasksDataSource;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
@@ -21,14 +19,10 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
 public class GetToDoneProActivity extends Activity {
-	ITasksDataSource datasource;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		datasource = new TasksDataSource(this);
-		datasource.resume();
-
 		setContentView(R.layout.main);
 
 		ActionBar bar = getActionBar();
@@ -94,12 +88,10 @@ public class GetToDoneProActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		datasource.pause();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		datasource.resume();
 	}
 }
