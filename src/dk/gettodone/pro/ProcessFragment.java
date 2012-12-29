@@ -1,6 +1,5 @@
 package dk.gettodone.pro;
 
-import java.util.Calendar;
 import java.util.List;
 
 import dk.gettodone.pro.data.ContentHelper;
@@ -10,6 +9,7 @@ import dk.gettodone.pro.data.Task;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.ContentObserver;
@@ -219,6 +219,19 @@ public class ProcessFragment extends Fragment {
 		btnCalendar.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
+			    // DialogFragment.show() will take care of adding the fragment
+			    // in a transaction.  We also want to remove any currently showing
+			    // dialog, so make our own transaction and take care of that here.
+			    FragmentTransaction ft = getFragmentManager().beginTransaction();
+			    Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+			    if (prev != null) {
+			        ft.remove(prev);
+			    }
+			    ft.addToBackStack(null);
+				CalendarizeFragment calendarDialog = new CalendarizeFragment();
+				
+				calendarDialog.show(ft, "dialog");
+/*
 				Calendar cal = Calendar.getInstance();
 				Intent intent = new Intent(Intent.ACTION_EDIT);
 				intent.setType("vnd.android.cursor.item/event");
@@ -227,11 +240,9 @@ public class ProcessFragment extends Fragment {
 						cal.getTimeInMillis() + 60 * 60 * 1000);
 				intent.putExtra("title", activeTask.getTitle());
 				startActivityForResult(intent, CREATE_CALENDAR_REQUEST);
-			}
-
-		}
-
-		);
+*/
+				}
+		});
 
 		showNextProcessableTask(result);
 		return result;
@@ -285,7 +296,7 @@ public class ProcessFragment extends Fragment {
 
 				Toast.makeText(getActivity(), "Put in calendar", 1000).show();
 				showNextProcessableTask();
-			}			
+			}
 		}
 	}
 

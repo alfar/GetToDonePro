@@ -24,4 +24,8 @@
 	
 	<string name="activity_agenda">Agenda</string>
 	<string name="agenda_call">Call</string>
+	
+	<string name="calendarize_allday">All day</string>
+	
+	<string name="ellipsis">…</string>
 </resources>
