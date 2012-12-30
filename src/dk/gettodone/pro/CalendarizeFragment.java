@@ -47,6 +47,9 @@ public class CalendarizeFragment extends DialogFragment implements
 				timeButton.setEnabled(!isChecked);
 			}
 		});
+		
+		Button cancelButton = (Button)result.findViewById(R.id.calendarize_cancel_button);
+		cancelButton.setOnClickListener(this);
 
 		return result;
 	}
@@ -73,6 +76,8 @@ public class CalendarizeFragment extends DialogFragment implements
 		case R.id.calendarize_time_button:
 			showTimePicker(v);
 			break;
+		case R.id.calendarize_cancel_button:
+			this.dismiss();
 		}
 	}
 }

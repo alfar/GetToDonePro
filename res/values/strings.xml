@@ -28,4 +28,7 @@
 	<string name="calendarize_allday">All day</string>
 	
 	<string name="ellipsis">…</string>
+	
+	<string name="cancel">Cancel</string>
+	<string name="calendarize_send">Send to Calendar</string>
 </resources>
