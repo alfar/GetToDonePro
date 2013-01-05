@@ -1,12 +1,16 @@
 package dk.gettodone.pro.data;
 
+import java.util.Calendar;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.provider.CalendarContract.Events;
 
 public class ContentHelper {
 	private static String[] taskColumns = new String[] {
@@ -51,6 +55,40 @@ public class ContentHelper {
 						+ Long.toString(id)), mUpdateValues, null, null);
 
 		createTask(contentResolver, title);
+	}
+
+	public static void processTaskToCalendar(ContentResolver contentResolver,
+			long id, String title, long calendarId, Date startDate,
+			String timezone, boolean allDay) {
+		java.util.Calendar cal = Calendar.getInstance();
+		cal.setTimeZone(TimeZone.getTimeZone(timezone));
+		cal.setTime(startDate);
+		long start = cal.getTimeInMillis();
+		ContentValues values = new ContentValues();
+		values.put(Events.DTSTART, start);
+		values.put(Events.DTEND, start);
+		values.put(Events.TITLE, title);
+		values.put(Events.CALENDAR_ID, calendarId);
+		values.put(Events.EVENT_TIMEZONE, timezone);
+		values.put(Events.DESCRIPTION, "");
+		// reasonable defaults exist:
+		values.put(Events.ACCESS_LEVEL, Events.ACCESS_PUBLIC);
+		values.put(Events.SELF_ATTENDEE_STATUS, Events.STATUS_CONFIRMED);
+		if (allDay) {
+			values.put(Events.ALL_DAY, 1);
+		}
+		values.put(Events.AVAILABILITY, Events.AVAILABILITY_BUSY);
+		Uri uri = contentResolver.insert(Events.CONTENT_URI, values);
+
+		ContentValues mUpdateValues = new ContentValues();
+
+		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_DELEGATETYPE, 2);
+		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_DELEGATEURL,
+				uri.toString());
+
+		contentResolver.update(
+				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
+						+ Long.toString(id)), mUpdateValues, null, null);
 	}
 
 	public static long createTask(ContentResolver contentResolver, String title) {

@@ -30,5 +30,7 @@
 	<string name="ellipsis">…</string>
 	
 	<string name="cancel">Cancel</string>
-	<string name="calendarize_send">Send to Calendar</string>
+	<string name="calendarize_send">Create</string>
+	<string name="calendarize_calendar">Calendar</string>
+	<string name="calendarize_from">From</string>
 </resources>

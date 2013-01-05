@@ -228,7 +228,7 @@ public class ProcessFragment extends Fragment {
 			        ft.remove(prev);
 			    }
 			    ft.addToBackStack(null);
-				CalendarizeFragment calendarDialog = new CalendarizeFragment();
+				CalendarizeFragment calendarDialog = CalendarizeFragment.newInstance(activeTask);
 				
 				calendarDialog.show(ft, "dialog");
 /*

@@ -10,15 +10,15 @@ import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.widget.DatePicker;
-import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 public class TimePickerFragment extends DialogFragment implements
 		TimePickerDialog.OnTimeSetListener {
 	
-	private EditText target; 
+	private TextView target; 
 	
-	public TimePickerFragment(EditText target)
+	public TimePickerFragment(TextView target)
 	{
 		this.target = target;
 	}

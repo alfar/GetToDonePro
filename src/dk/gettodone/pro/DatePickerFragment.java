@@ -10,14 +10,14 @@ import android.app.DialogFragment;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.widget.DatePicker;
-import android.widget.EditText;
+import android.widget.TextView;
 
 public class DatePickerFragment extends DialogFragment implements
 		DatePickerDialog.OnDateSetListener {
 	
-	private EditText target; 
+	private TextView target; 
 	
-	public DatePickerFragment(EditText target)
+	public DatePickerFragment(TextView target)
 	{
 		this.target = target;
 	}
