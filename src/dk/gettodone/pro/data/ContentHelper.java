@@ -33,7 +33,7 @@ public class ContentHelper {
 						+ TasksOpenHelper.COLUMN_TASKS_ISPROJECT
 						+ " IS NULL AND "
 						+ TasksOpenHelper.COLUMN_TASKS_DELEGATETYPE
-						+ " IS NULL", null, TasksOpenHelper.COLUMN_TASKS_TITLE);
+						+ " IS NULL", null, TasksOpenHelper.COLUMN_ID);
 
 		cursor.moveToFirst();
 		Task task = null;
