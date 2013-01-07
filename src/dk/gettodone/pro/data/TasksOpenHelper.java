@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class TasksOpenHelper extends SQLiteOpenHelper {
-	private static final int DATABASE_VERSION = 5;
+	private static final int DATABASE_VERSION = 6;
 	private static final String DATABASE_NAME = "gettodone.db";
 	public static final String TABLE_TASKS = "Tasks";
 	public static final String COLUMN_ID = "_id";
@@ -46,6 +46,8 @@ public class TasksOpenHelper extends SQLiteOpenHelper {
 			COLUMN_ID + " integer primary key autoincrement, " +
 			COLUMN_CONTEXTS_NAME + " text not null)";
 	
+	private static final String TASKS_TABLE_CLEAN_CALENDAR = "delete from " + TABLE_TASKS + " where " + COLUMN_TASKS_DELEGATETYPE + " = 2";
+	
 	public TasksOpenHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -71,6 +73,9 @@ public class TasksOpenHelper extends SQLiteOpenHelper {
 		if (oldVersion < 5) {
 			db.execSQL(TASKS_TABLE_ADDDELEGATETYPE);
 			db.execSQL(TASKS_TABLE_ADDDELEGATEURL);						
+		}
+		if (oldVersion < 6) {
+			db.execSQL(TASKS_TABLE_CLEAN_CALENDAR);			
 		}
 	}
 

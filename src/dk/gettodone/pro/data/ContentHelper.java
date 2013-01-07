@@ -33,7 +33,8 @@ public class ContentHelper {
 						+ TasksOpenHelper.COLUMN_TASKS_ISPROJECT
 						+ " IS NULL AND "
 						+ TasksOpenHelper.COLUMN_TASKS_DELEGATETYPE
-						+ " IS NULL", null, TasksOpenHelper.COLUMN_ID);
+						+ " IS NULL", null, TasksOpenHelper.TABLE_TASKS + "."
+						+ TasksOpenHelper.COLUMN_ID);
 
 		cursor.moveToFirst();
 		Task task = null;
@@ -78,17 +79,19 @@ public class ContentHelper {
 			values.put(Events.ALL_DAY, 1);
 		}
 		values.put(Events.AVAILABILITY, Events.AVAILABILITY_BUSY);
-		Uri uri = contentResolver.insert(Events.CONTENT_URI, values);
+		contentResolver.insert(Events.CONTENT_URI, values);
 
-		ContentValues mUpdateValues = new ContentValues();
-
-		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_DELEGATETYPE, 2);
-		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_DELEGATEURL,
-				uri.toString());
-
-		contentResolver.update(
-				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
-						+ Long.toString(id)), mUpdateValues, null, null);
+		deleteTask(contentResolver, id);
+		
+//		ContentValues mUpdateValues = new ContentValues();
+//
+//		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_DELEGATETYPE, 2);
+//		mUpdateValues.put(TasksOpenHelper.COLUMN_TASKS_DELEGATEURL,
+//				uri.toString());
+//
+//		contentResolver.update(
+//				Uri.withAppendedPath(GetToDoneProContentProvider.TASKS_URI, "/"
+//						+ Long.toString(id)), mUpdateValues, null, null);
 	}
 
 	public static long createTask(ContentResolver contentResolver, String title) {

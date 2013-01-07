@@ -58,7 +58,8 @@ public class GetToDoneProActivity extends Activity {
 
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE || event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+				if (actionId == EditorInfo.IME_ACTION_DONE
+						|| event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
 					return buttonCollect.performClick();
 				}
 				return false;
@@ -67,20 +68,23 @@ public class GetToDoneProActivity extends Activity {
 
 		buttonCollect.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
-				ContentHelper.createTask(getContentResolver(), textCollect.getText().toString());
+				ContentHelper.createTask(getContentResolver(), textCollect
+						.getText().toString());
 				textCollect.setText("");
-			}			
+			}
 		});
 		return true;
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.item_collect) {
+		switch (item.getItemId()) {
+		case R.id.item_collect:
 			InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 			View collectView = item.getActionView();
 			imm.showSoftInput(collectView.findViewById(R.id.textCollect),
 					InputMethodManager.SHOW_IMPLICIT);
+			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
