@@ -26,5 +26,8 @@
     <string name="calendarize_send">Create</string>
     <string name="calendarize_calendar">Calendar</string>
     <string name="calendarize_from">From</string>
-
+	<string name="login_email">Email</string>
+	<string name="login_password">Password</string>
+	<string name="login_login">Log in</string>
+	<string name="ACCOUNT_TYPE">dk.gettodone.pro.account</string>
 </resources>

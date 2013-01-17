@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+  <PreferenceCategory
+            android:title="General Settings" />
+ 
+    <PreferenceScreen
+        android:key="account_settings"
+        android:title="Account Settings"
+        android:summary="Sync frequency, notifications, etc.">
+        <intent
+            android:action="dk.gettodone.pro.Preferences.ACCOUNT_SETUP"
+            android:targetPackage="dk.gettodone.pro"
+            android:targetClass="dk.gettodone.pro.PreferencesActivity" />
+    </PreferenceScreen>
+</PreferenceScreen>
